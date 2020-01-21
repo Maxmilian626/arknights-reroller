@@ -184,12 +184,20 @@ def screenshotTest():
 '''
 
 def guestAccCreate():
-    for i in range(2) #Do two sweeps for if understood.
+    #doesn't account for no account/fresh start.
+    for i in range(2): #Do two sweeps for if understood.
         if image_is_on_screen('understood'):
+            wait(5)
             click(**UNDERSTOOD)
-    wait_until('start')
-    click(**ACCOUNT_MANAGEMENT)
-    wait(1)
+        else:
+            print('Understood Not Found.')
+            wait(3)
+
+    if image_is_on_screen('start'): #
+        print('Continuing Reroll')
+        click(**ACCOUNT_MANAGEMENT)
+
+    wait_until('guest_button')
     click(**GUEST)
     wait(1)
     click(**CONFIRM) #When they ask about switching login.
@@ -201,9 +209,10 @@ def agree_terms_of_service():
     agree_ToS()
 
 def type_name():
-    click(**NAME_FIELD)
-    wait_until('keyboard ok') #sometimes doesn't get the keyboard up.
-    wait(5)
+    while not(image_is_on_screen('keyboard ok')): #click until keyboard is onscreen.
+        click(**NAME_FIELD)
+        wait(4)
+
     pyautogui.typewrite(settings.NAME, interval = 0.25)
     click(1720, 965) #Android OK Button
     wait(5) #wait until keyboard gone.
@@ -221,7 +230,7 @@ def battle0():
     clickUntil('texas_skill1')
     click(700, 460) #circle around Texas
     clickUntil('texas_skill2')
-    click(1260, 600) #Texas' Skill use. Need better ID than "Use"
+    click(1260, 600) #Texas' Skill use. Need better template than "Use", takes a while
     clickUntil('c99')
     click(**TWO_X)
     clickUntil('skip2')
@@ -254,7 +263,10 @@ def zeroOneSelect():
     click(600, 600) #big blue button
     wait_until('0-1_select')
     click(930, 500) #0-1
-    wait_until('startStage')
+    while not(image_is_on_screen('startStage')): #basically too lazy to implement clickuntil(special param)
+        click(930, 500)
+        wait(2)
+    #wait_until('startStage')
     click(**STARTSTAGE)
     wait_until('missionStart')
     click(**MISSIONSTART)
@@ -281,11 +293,13 @@ def TR1_select():
     print('TR-1')
     clickUntil('manage_mission')
     click(420,900)
+    print('chapter selected')
     clickUntil('startStage')
     wait(2)
     click(**STARTSTAGE)
 
 def TR1_start():
+    print('TR-1 start')
     clickUntil('tr1_start')
     wait(1)
     click(**MISSIONSTART)
@@ -301,8 +315,12 @@ def TR1_start():
 
 def redeemDaily():
     print('Redeem Daily')
-    wait_until('LMDGet')
-    click(**DEFAULT)
+    wait_until('mainmenu1') #waiting for the announcements to show up and load.
+    wait(5)
+    click(1755,110) #exit button.
+    wait(5)
+    clickUntil('LMDGet') #game will automatically show the "click to continue" for lmd
+    #click(**DEFAULT)
     wait_until('menuexit')
     click(**MAINMENUEXIT)
     print('Redeem Daily Done')
@@ -328,15 +346,13 @@ def redeemMail():
     wait_until('mail_available')
     click(310,80) #mailbox icon
     wait_until('mailbox_loaded')
-    click(1600, 960) #CollectAll
-    wait(2)
-    # wait_until('savage_get')
-    # wait(2)
-    # click(**DEFAULT)
-    # wait(6) #waiting for everything to load
-    # click(**DEFAULT)
-    # wait_until('mailcanback')
-    clickUntil('mailcanback')
+    while (image_is_on_screen('collectAll')):
+        click(1600, 960) #CollectAll
+        wait(3)
+
+    clickUntil('mailcanback') #keep clicking until can back
+    print('savage get')
+    wait(3)
     click(120,90) #exit mailbox
     print('Redeem Mail Done')
 
